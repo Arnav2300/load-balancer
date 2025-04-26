@@ -1,0 +1,11 @@
+routes:
+  - path_prefix: /user
+    backends:
+      - http://localhost:8001
+      - http://localhost:8002
+  - path_prefix: /settings
+    backends:
+      - https://localhost:9001
+
+keys:
+  value: abc
