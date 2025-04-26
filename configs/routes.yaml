@@ -6,6 +6,3 @@ routes:
   - path_prefix: /settings
     backends:
       - https://localhost:9001
-
-keys:
-  value: abc
