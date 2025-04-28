@@ -1,0 +1,15 @@
+routes:
+  - path_prefix: /user
+    backends:
+      - http://localhost:8001
+      - http://localhost:8002
+  - path_prefix: /settings
+    backends:
+      - https://localhost:8084
+  - path_prefix: /profile
+    backends:
+      - https://localhost:8081
+      - https://localhost:8082
+      - https://localhost:8083
+
+  
