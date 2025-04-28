@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func NewProxy(target *url.URL) *httputil.ReverseProxy {
+func NewReverseProxy(target *url.URL) *httputil.ReverseProxy {
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	return proxy
 }
@@ -18,7 +18,7 @@ func ProxyRequestHandler(proxy *httputil.ReverseProxy, url *url.URL, endpoint st
 		r.Header.Set("X-Forwarded-Host", r.Header.Get("Host"))
 		r.Host = url.Host
 		path := r.URL.Path
-		r.URL.Path = strings.TrimLeft(path, endpoint)
+		r.URL.Path = strings.TrimPrefix(path, endpoint)
 		proxy.ServeHTTP(w, r)
 	}
 }

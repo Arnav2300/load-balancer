@@ -9,6 +9,7 @@ import (
 type Route struct {
 	PathPrefix string   `yaml:"path_prefix"`
 	Backends   []string `yaml:"backends"`
+	Methods    []string `yaml:"methods"`
 }
 type Config struct {
 	Routes []Route `yaml:"routes"`

@@ -1,5 +1,9 @@
 routes:
   - path_prefix: /user
+    methods:
+      - POST
+      - GET
+      - PUT
     backends:
       - http://localhost:8001
       - http://localhost:8002
@@ -11,5 +15,7 @@ routes:
       - https://localhost:8081
       - https://localhost:8082
       - https://localhost:8083
+    methods:
+      - GET
 
   
