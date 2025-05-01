@@ -5,20 +5,25 @@ import (
 	"load-balancer/internal/loadbalancer"
 	"load-balancer/internal/proxy"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"slices"
 	"strings"
+	"sync"
 )
 
 type Gateway struct {
 	config       *config.Config
 	loadBalancer *loadbalancer.LoadBalancer
+	proxies      map[string]*httputil.ReverseProxy
+	proxiesMU    sync.RWMutex
 }
 
 func NewGateway(cfg *config.Config, lb *loadbalancer.LoadBalancer) *Gateway {
 	return &Gateway{
 		config:       cfg,
 		loadBalancer: lb,
+		proxies:      make(map[string]*httputil.ReverseProxy),
 	}
 }
 
@@ -44,7 +49,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid backend URL", http.StatusInternalServerError)
 		return
 	}
-	reverseProxy := proxy.NewReverseProxy(target)
+	reverseProxy := g.getOrCreateProxy(target)
 	handler := proxy.ProxyRequestHandler(reverseProxy, target, route.PathPrefix)
 	handler(w, r)
 
@@ -57,4 +62,18 @@ func (g *Gateway) matchRoute(path string) *config.Route {
 		}
 	}
 	return nil
+}
+func (g *Gateway) getOrCreateProxy(target *url.URL) *httputil.ReverseProxy {
+	g.proxiesMU.RLock()
+	existingProxy, exists := g.proxies[target.String()]
+	g.proxiesMU.RUnlock()
+	if exists {
+		return existingProxy
+	}
+	newProxy := proxy.NewReverseProxy(target)
+	g.proxiesMU.Lock()
+	g.proxies[target.String()] = newProxy
+	g.proxiesMU.Unlock()
+
+	return newProxy
 }
