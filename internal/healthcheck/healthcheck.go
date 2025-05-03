@@ -50,13 +50,12 @@ func (hc *HealthChecker) Start(routes []config.Route) {
 }
 
 func (hc *HealthChecker) checkBackend(backend string) {
-	hc.mu.RLock()
+	hc.mu.Lock()
 	status, exists := hc.healthStatus[backend]
-	hc.mu.RUnlock()
-
 	if !exists {
 		status = &backendStatus{}
 	}
+	hc.mu.Unlock()
 
 	if time.Now().Before(status.NextRetryAfter) {
 		return
@@ -91,5 +90,6 @@ func (hc *HealthChecker) checkBackend(backend string) {
 func (hc *HealthChecker) IsHealthy(backend string) bool {
 	hc.mu.RLock()
 	defer hc.mu.RUnlock()
-	return hc.healthStatus[backend].Healthy
+	status, ok := hc.healthStatus[backend]
+	return ok && status.Healthy
 }
