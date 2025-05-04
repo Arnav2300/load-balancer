@@ -1,7 +1,6 @@
 package healthcheck
 
 import (
-	"fmt"
 	"load-balancer/internal/config"
 	"load-balancer/internal/logger"
 	"net/http"
@@ -60,7 +59,6 @@ func (hc *HealthChecker) checkBackend(backend string) {
 		status = &backendStatus{}
 	}
 	hc.mu.Unlock()
-
 	if time.Now().Before(status.NextRetryAfter) {
 		return
 	}
@@ -103,9 +101,6 @@ func (hc *HealthChecker) IsHealthy(backend string) bool {
 	hc.mu.RLock()
 	defer hc.mu.RUnlock()
 	status, ok := hc.healthStatus[backend]
-	for key, value := range hc.healthStatus {
-		fmt.Println("Key:", key, "Value:", value)
-	}
 	// fmt.Println(backend, " ", status.Healthy)
 	return ok && status.Healthy
 }

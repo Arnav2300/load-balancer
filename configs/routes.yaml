@@ -10,17 +10,21 @@ routes:
     health: /health
   - path_prefix: /settings
     backends:
-      - https://localhost:8084
+      - http://localhost:8084
+    health: /health
   - path_prefix: /profile
     backends:
-      - https://localhost:8081
-      - https://localhost:8082
-      - https://localhost:8083
+      - http://localhost:8081
+      - http://localhost:8082
+      - http://localhost:8083
     methods:
       - GET
+      - POST
+      - DELETE
     health: /health
 
 port: ":8080"
 env: "development"
 log_level: "INFO"
+
   
