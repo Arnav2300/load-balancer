@@ -16,6 +16,7 @@ type Config struct {
 	Port     string  `yaml:"port"`
 	Env      string  `yaml:"env"`
 	LogLevel string  `yaml:"log_level"`
+	LogFile  string  `yaml:"log_file"`
 }
 
 func LoadConfig() ([]byte, error) {

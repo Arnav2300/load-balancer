@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"load-balancer/internal/config"
 	"os"
 	"strings"
 
@@ -14,7 +15,7 @@ type LoggerConfig struct {
 	LogFile  string
 }
 
-func NewLogger(cfg LoggerConfig) (*zap.Logger, error) {
+func NewLogger(cfg *config.Config) (*zap.Logger, error) {
 	if cfg.Env == "" {
 		cfg.Env = "development"
 	}
