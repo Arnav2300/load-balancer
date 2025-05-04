@@ -101,6 +101,5 @@ func (hc *HealthChecker) IsHealthy(backend string) bool {
 	hc.mu.RLock()
 	defer hc.mu.RUnlock()
 	status, ok := hc.healthStatus[backend]
-	// fmt.Println(backend, " ", status.Healthy)
 	return ok && status.Healthy
 }

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -31,6 +30,5 @@ func ParseConfig(yamlFile []byte) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(cfg)
 	return &cfg, nil
 }

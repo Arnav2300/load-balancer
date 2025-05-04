@@ -1,7 +1,6 @@
 package loadbalancer
 
 import (
-	"fmt"
 	"load-balancer/internal/healthcheck"
 	"sync"
 )
@@ -23,7 +22,6 @@ func (lb *LoadBalancer) SetHealthChecker(hc *healthcheck.HealthChecker) {
 }
 
 func (lb *LoadBalancer) SelectBackend(pathPrefix string, backends []string, health string) (string, bool) {
-	fmt.Println(pathPrefix, backends)
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 
