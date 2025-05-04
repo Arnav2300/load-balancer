@@ -9,12 +9,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type LoggerConfig struct {
-	Env      string
-	LogLevel string
-	LogFile  string
-}
-
 func NewLogger(cfg *config.Config) (*zap.Logger, error) {
 	if cfg.Env == "" {
 		cfg.Env = "development"

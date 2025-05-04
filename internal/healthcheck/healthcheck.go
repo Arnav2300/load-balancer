@@ -1,10 +1,14 @@
 package healthcheck
 
 import (
+	"fmt"
 	"load-balancer/internal/config"
+	"load-balancer/internal/logger"
 	"net/http"
 	"sync"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type backendStatus struct {
@@ -39,7 +43,7 @@ func (hc *HealthChecker) Start(routes []config.Route) {
 					wg.Add(1)
 					go func(b string) {
 						defer wg.Done()
-						hc.checkBackend(b)
+						hc.checkBackend(b + route.PathPrefix + route.Health)
 					}(backend)
 				}
 			}
@@ -61,12 +65,13 @@ func (hc *HealthChecker) checkBackend(backend string) {
 		return
 	}
 
-	resp, err := hc.client.Get(backend + "/health")
+	resp, err := hc.client.Get(backend)
 	healthy := err == nil && resp.StatusCode == http.StatusOK
 
 	hc.mu.Lock()
 	defer hc.mu.Unlock()
 	// hc.healthStatus[backend] = status
+	prevHealthy := status.Healthy
 
 	if healthy {
 		status.Healthy = true
@@ -80,8 +85,15 @@ func (hc *HealthChecker) checkBackend(backend string) {
 			backoffDuration = 5 * time.Minute
 		}
 		status.NextRetryAfter = time.Now().Add(backoffDuration)
+		// logger.Get().Info("health check", zap.String("DEAD", backend))
 	}
-
+	if prevHealthy != status.Healthy {
+		if status.Healthy {
+			logger.Get().Info("health check", zap.String("ALIVE", backend))
+		} else {
+			logger.Get().Warn("health check", zap.String("DEAD", backend))
+		}
+	}
 	hc.healthStatus[backend] = status
 	if resp != nil && resp.Body != nil {
 		resp.Body.Close()
@@ -91,5 +103,9 @@ func (hc *HealthChecker) IsHealthy(backend string) bool {
 	hc.mu.RLock()
 	defer hc.mu.RUnlock()
 	status, ok := hc.healthStatus[backend]
+	for key, value := range hc.healthStatus {
+		fmt.Println("Key:", key, "Value:", value)
+	}
+	// fmt.Println(backend, " ", status.Healthy)
 	return ok && status.Healthy
 }

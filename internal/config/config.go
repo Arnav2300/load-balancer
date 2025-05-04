@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -10,6 +11,7 @@ type Route struct {
 	PathPrefix string   `yaml:"path_prefix"`
 	Backends   []string `yaml:"backends"`
 	Methods    []string `yaml:"methods"`
+	Health     string   `yaml:"health"`
 }
 type Config struct {
 	Routes   []Route `yaml:"routes"`
@@ -29,5 +31,6 @@ func ParseConfig(yamlFile []byte) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(cfg)
 	return &cfg, nil
 }

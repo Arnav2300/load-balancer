@@ -3,6 +3,7 @@ package handler
 import (
 	"load-balancer/internal/config"
 	"load-balancer/internal/loadbalancer"
+	"load-balancer/internal/logger"
 	"load-balancer/internal/proxy"
 	"net/http"
 	"net/http/httputil"
@@ -10,6 +11,8 @@ import (
 	"slices"
 	"strings"
 	"sync"
+
+	"go.uber.org/zap"
 )
 
 type Gateway struct {
@@ -38,7 +41,8 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	backendURL, ok := g.loadBalancer.SelectBackend(route.PathPrefix, route.Backends)
+	backendURL, ok := g.loadBalancer.SelectBackend(route.PathPrefix, route.Backends, route.Health)
+	logger.Get().Info("routing to", zap.String("backend url", backendURL))
 	if !ok {
 		http.Error(w, "No backends available", http.StatusBadGateway)
 		return

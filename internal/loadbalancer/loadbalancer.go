@@ -1,6 +1,7 @@
 package loadbalancer
 
 import (
+	"fmt"
 	"load-balancer/internal/healthcheck"
 	"sync"
 )
@@ -21,7 +22,8 @@ func (lb *LoadBalancer) SetHealthChecker(hc *healthcheck.HealthChecker) {
 	lb.healthChecker = hc
 }
 
-func (lb *LoadBalancer) SelectBackend(pathPrefix string, backends []string) (string, bool) {
+func (lb *LoadBalancer) SelectBackend(pathPrefix string, backends []string, health string) (string, bool) {
+	fmt.Println(pathPrefix, backends)
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 
@@ -30,7 +32,7 @@ func (lb *LoadBalancer) SelectBackend(pathPrefix string, backends []string) (str
 	}
 	healthy := make([]string, 0, len(backends))
 	for _, b := range backends {
-		if lb.healthChecker == nil || lb.healthChecker.IsHealthy(b) {
+		if lb.healthChecker == nil || lb.healthChecker.IsHealthy(b+pathPrefix+health) {
 			healthy = append(healthy, b)
 		}
 	}
@@ -38,7 +40,7 @@ func (lb *LoadBalancer) SelectBackend(pathPrefix string, backends []string) (str
 		return "", false
 	}
 	idx := lb.counters[pathPrefix] % len(healthy)
-	backend := healthy[idx]
+	backend := healthy[idx] + pathPrefix
 	lb.counters[pathPrefix] = (lb.counters[pathPrefix] + 1) % len(healthy)
 
 	return backend, true
