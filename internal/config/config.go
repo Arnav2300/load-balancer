@@ -12,7 +12,10 @@ type Route struct {
 	Methods    []string `yaml:"methods"`
 }
 type Config struct {
-	Routes []Route `yaml:"routes"`
+	Routes   []Route `yaml:"routes"`
+	Port     string  `yaml:"port"`
+	Env      string  `yaml:"env"`
+	LogLevel string  `yaml:"log_level"`
 }
 
 func LoadConfig() ([]byte, error) {

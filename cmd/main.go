@@ -13,10 +13,10 @@ import (
 func main() {
 	yamlBytes, _ := config.LoadConfig()
 	cfg, _ := config.ParseConfig(yamlBytes)
-	fmt.Println(cfg.Routes[2])
+	fmt.Println(cfg.Port)
 	lb := loadbalancer.NewLoadBalancer()
 	gateway := handler.NewGateway(cfg, lb)
-	if err := http.ListenAndServe(":8080", gateway); err != nil {
+	if err := http.ListenAndServe(cfg.Port, gateway); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
 }
